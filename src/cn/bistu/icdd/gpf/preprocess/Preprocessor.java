@@ -148,7 +148,7 @@ public class Preprocessor {
 				sb = null;
 				content = null;
 				// 全部处理
-				 passage = (String) filter.get(3).process(filter.get(2).process(filter.get(1).process(filter.get(0).process(passage))));
+				 passage = processString(passage);
 				
 				// 不归一处理
 				//passage = filter.get(2).process(filter.get(1).process(filter.get(0).process(passage))).toString().replace("[", "").replace("]", " ").replace(",", "");
@@ -184,4 +184,16 @@ public class Preprocessor {
 			
 		}
 	}
+
+	
+	/**
+	 * 处理字符串
+	 * @param passage 文本内容
+	 * @return 处理后的字符串
+	 */
+	private String processString(String passage){
+		
+		return (String) filter.get(3).process(filter.get(2).process(filter.get(1).process(filter.get(0).process(passage))));
+	}
+
 }
