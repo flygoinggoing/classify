@@ -46,6 +46,26 @@ public class WordFilter implements Filter<String,String>{
 	}
 	
 	/**
+	 * 当文本格式内容比较乱时使用（语料不太好）
+	 * @param passage 待处理字符串
+	 * @return 处理好的字符串
+	 */
+	private String roughTreatment(String passage){
+		return null;
+		
+	}
+	
+	/**
+	 * 当文本格式内容比较统一时（语料好）
+	 * @param passage 待处理字符串
+	 * @return 处理好的字符串
+	 */
+	private String precisionTreatment(String passage){
+		return null;
+		
+	}
+	
+	/**
 	 * 全角验证
 	 * 
 	 * @param c 带判断字符

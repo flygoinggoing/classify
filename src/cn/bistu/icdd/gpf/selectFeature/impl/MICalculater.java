@@ -6,13 +6,11 @@ public class MICalculater implements IFeatureSelectionCalculater {
 
 	@Override
 	public void calcWeight() {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void extractFeature() {
-		// TODO Auto-generated method stub
 		
 	}
 
