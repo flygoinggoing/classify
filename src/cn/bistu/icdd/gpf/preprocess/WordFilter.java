@@ -73,6 +73,7 @@ public class WordFilter implements Filter<String,String>{
 		 * Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B    // 扩展区B 
 		 */
 		if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS     /*  CJk（中日韩）  */
+				|| ub == Character.UnicodeBlock.BASIC_LATIN     /* 拉丁 */
 				|| ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS     /* CJK补充 */
 				|| ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION     /* 中文标点  〔  〕  〖  〗有待解决  */
 				|| ub == Character.UnicodeBlock.GENERAL_PUNCTUATION) {    /* 汉语引号   ‰ 有待解决 */
