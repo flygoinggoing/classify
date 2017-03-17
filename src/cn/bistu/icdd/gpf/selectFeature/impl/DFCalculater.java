@@ -138,15 +138,17 @@ public class DFCalculater implements IFeatureSelectionCalculater{
 			BufferedReader br = null;
 			try {
 				br = new BufferedReader(new InputStreamReader(new FileInputStream(file),"utf-8"));
-				String content = null;
-				Set<String> set = new HashSet<String>();
-				/*
-				 * 把数组转化为set集合 
-				 */
-				while ((content = br.readLine()) != null) {
-					set.addAll(Arrays.asList(content.split(" ")));
+				
+				StringBuilder sb = new StringBuilder();
+				String line = null;
+				while ((line = br.readLine()) != null) {
+					sb.append(line);
 				}
-
+				
+				line = sb.toString();
+				Set<String> set = new HashSet<String>(Arrays.asList(line.split(" ")));
+				sb = null;
+				
 				//可以在这里实现   边插入Map 边计算DF
 				Iterator<String> iter = set.iterator();
 				while (iter.hasNext()) {
