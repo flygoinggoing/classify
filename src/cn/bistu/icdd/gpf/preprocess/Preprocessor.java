@@ -48,7 +48,8 @@ public class Preprocessor {
 		PartOfSpeechFilter posf = new PartOfSpeechFilter();
 		// TokenizerFilter tf = new TokenizerFilter();
 		StopWordFilter swf = StopWordFilter.getInstance();
-		NormalizationFilter nf = NormalizationFilter.getInstance();
+		//NormalizationFilter nf = NormalizationFilter.getInstance();
+		NormalizationHashFilter nf = NormalizationHashFilter.getInstance();
 		
 		// 将处理器添加到流
 		filter.add(wf);

@@ -7,38 +7,41 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Properties;
 
 /**
- * 归一化过滤器(单例模式)
- * 在语义上进行处理
- * 
- * 1.同义词过滤器（SynonymFilter）
- * 作用：合并同义词
- * 
- * 2.在英文中，经常要词干提取。就是同一个词的不同变形表示为统一的格式。（此处暂时不考虑英文）
- * 如：cat 和 cats 应该统一表示为 cat。
+ * 同义词归一改进
+ * 使用HashMap存
+ * 比如说   它们 她们  他们是同义词
+ * 这样建表：他们 它们
+ * 		       她们 它们
+ * 	value位置存每行的第一个词
+ * 	占用空间也不多  不会超过原表的二倍
  * 
  * @author 关鹏飞
  *
  */
-public class NormalizationFilter implements Filter<List<String>, String>{
-	/**
-	 *  同义词表
+public class NormalizationHashFilter implements Filter<List<String>, String>{
+
+	/*
+	 * 同义词表
 	 */
-	private static LinkedList<LinkedList<String>> sysnonym = new LinkedList<LinkedList<String>>();
+	private static HashMap<String,String> sysnonymHash = new HashMap<String, String>();
 	
 	// 实例
-	private static NormalizationFilter instance = null;
+	private static NormalizationHashFilter instance = null;
 	
 	/**
 	 *  初始化（读入同义词表）
 	 */
-	private NormalizationFilter(){
+	private NormalizationHashFilter(){
 		System.out.print("开始加载同义词——");
 		BufferedReader br = null;
 		Properties pro = new Properties();
@@ -50,8 +53,12 @@ public class NormalizationFilter implements Filter<List<String>, String>{
 			br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(synonymPath)),"utf-8"));
 			String line = null;
 			while ((line = br.readLine())!=null) {
-				LinkedList<String> list =new LinkedList<String>(Arrays.asList(line.split(" ")));
-				sysnonym.add(list);
+				ArrayList<String> list =new ArrayList<String>(Arrays.asList(line.split(" ")));
+				String firstWord = list.get(0);
+				for (int i = 1; i < list.size(); i++) {
+					String word = list.get(i);
+					sysnonymHash.put(word,firstWord);
+				}
 			}
 			
 			System.out.println("完成");
@@ -76,62 +83,29 @@ public class NormalizationFilter implements Filter<List<String>, String>{
 	 * 获取实例
 	 * @return 返回实例
 	 */
-	public static NormalizationFilter getInstance() {
+	public static NormalizationHashFilter getInstance() {
 		
 		// 加锁
 		synchronized (StopWordFilter.class) {
 			if (instance == null) {
-				instance = new NormalizationFilter();
+				instance = new NormalizationHashFilter();
 			}
 		}
 		
 		return instance;
 	}
 	
-	/**
-	 * 归一化主函数
-	 * @param passage 待处理的集合
-	 * @return 返回处理好的字符串
-	 */
 	@Override
 	public String process(List<String> passage) {
-		
-		/*
-		 * 
-		 */
-		/*
+
 		ListIterator<String> iter = passage.listIterator();
-		OUT:
 		while (iter.hasNext()) {
 			String word = iter.next();
-			for (LinkedList<String> list : sysnonym) {
-				// 从每行的第二个开始 ，有一样的用行首词代替
-				for (String str : list) {
-					if (str.equals(word)) {
-						iter.set(list.get(0));
-						continue OUT;  // 找到后跳到最外层循环
-					}
-				}
+			if (sysnonymHash.containsKey(word)) {
+				iter.set(sysnonymHash.get(word));
 			}
 		}
-		*/
-		
-		ListIterator<String> iter;
-		for (LinkedList<String> list : sysnonym) {
-			String firstWord = list.get(0);
-			// 从每行的第二个开始 ，有一样的用行首词代替
-			for (String str : list) {
-				iter = passage.listIterator();
-				while (iter.hasNext()) {
-					String word = iter.next();
-					if (str.equals(word)) {
-						iter.set(firstWord);
-					}
-				}
-			}
-		}
-		
-		
+
 		return passage.toString().replace("[", "").replace("]", " ").replace(",", "");
 	}
 
