@@ -23,8 +23,8 @@ import cn.bistu.icdd.gpf.selectFeature.IFeatureSelectionCalculater;
  */
 public class MICalculater implements IFeatureSelectionCalculater {
 
-	// 定义存储形式 (原始特征项表) 格式： key:String(特征项)  value: List(DF  类内DF)
-	HashMap<String, ArrayList<Integer>> featureMap = new HashMap<String, ArrayList<Integer>>();	
+	// 定义存储形式 (原始特征项表) 格式： key:String(特征项)  value: FeatureInfo（int(DF)  List(类内DF)）
+	HashMap<String, FeatureInfo> featureMap = new HashMap<String, FeatureInfo>();	
 	
 	// 文本总数
 	int N;
@@ -66,6 +66,8 @@ public class MICalculater implements IFeatureSelectionCalculater {
 				InitFeatureMap(f);
 			}
 		} else {
+			// 记录总文件个数
+			N++;
 			// 记录每类文件个数
 			Classs classs= addNj(file.getName());
 			// 返回空 表示文件不在提前定义的类范围内
@@ -74,6 +76,7 @@ public class MICalculater implements IFeatureSelectionCalculater {
 			}
 			
 			BufferedReader br = null;
+			Set<String> features = null;
 			try {
 				// 读出文本中的特征项
 				br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
@@ -84,27 +87,9 @@ public class MICalculater implements IFeatureSelectionCalculater {
 				}
 				
 				line = sb.toString();
-				Set<String> feature = new HashSet<String>(Arrays.asList(line.split(" ")));
+				features = new HashSet<String>(Arrays.asList(line.split(" ")));
 				sb = null;
 				
-				// 读出文本中的特征项初始化featureMap
-				Iterator<String> iter = feature.iterator();
-				while (iter.hasNext()) {
-					String key = iter.next();
-					// featureMap中不包含key时，插入新行
-					if (!featureMap.containsKey(key)) {
-						ArrayList<Integer> initValue = new ArrayList<Integer>();
-						for (int i = 0; i <= Classs.values().length; i++ ) {
-							initValue.add(0);
-						}
-						featureMap.put(key, initValue);
-					}
-					// 更新DF与每类的DF
-					List<Integer> value = featureMap.get(key);
-					value.set(0, value.get(0)+1);  //DF++
-					int index = classs.ordinal();
-					value.set(index, value.get(index)+1); // 每类的DF++
-				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -117,6 +102,22 @@ public class MICalculater implements IFeatureSelectionCalculater {
 						e.printStackTrace();
 					}
 				}
+			}
+			
+			// 读出文本中的特征项初始化featureMap
+			Iterator<String> iter = features.iterator();
+			while (iter.hasNext()) {
+				String key = iter.next();
+				// featureMap中不包含key时，插入新行
+				if (!featureMap.containsKey(key)) {
+					FeatureInfo initValue = new FeatureInfo();
+					featureMap.put(key, initValue);
+				}
+				// 更新DF与每类的DF
+				FeatureInfo value = featureMap.get(key);
+				value.setDfIncrease();  //DF++
+				int index = classs.ordinal();
+				value.setDfOfEachClassIncrease(index); // 每类的DF++
 			}
 		}
 	}
@@ -185,4 +186,67 @@ public class MICalculater implements IFeatureSelectionCalculater {
 		}
 	}
 
+	/**
+	 * 特征值对应的信息
+	 * 
+	 * @author 关鹏飞
+	 */
+	class FeatureInfo {
+		int df;    // 文档频率
+		ArrayList<Integer> dfOfEachClass;  // 记录每类中的df值
+		ArrayList<Double> miOfEachClass;   // 记录互信息
+		
+		public FeatureInfo(){
+			df = 0;
+			dfOfEachClass = new ArrayList<Integer>();
+			miOfEachClass = new ArrayList<Double>();
+			for (int i = 0; i <= Classs.values().length; i++ ) {
+				dfOfEachClass.add(0);
+			}
+		}
+		
+		/**
+		 * @return 返回DF
+		 */
+		public int getDF(){
+			return df;
+		}
+		
+		/**
+		 * DF++
+		 * @param value 值
+		 */
+		public void setDfIncrease(){
+			df++;
+		}
+		
+		/**
+		 * 返回对应位置的类内df
+		 * @param index 序号
+		 * @return 类内df
+		 */
+		public int getDfOfEachClass(int index){
+			return dfOfEachClass.get(index);
+		}
+		
+		/**
+		 * 类内df值 ++
+		 * @param index 序号
+		 */
+		public void setDfOfEachClassIncrease(int index){
+			dfOfEachClass.set(index, getDfOfEachClass(index));
+		}
+		
+		/**
+		 * 设置MI值
+		 * @param index 序号
+		 * @param value 值
+		 */
+		public void setMiOfeachClass(int index, Double value){
+			miOfEachClass.set(index, value);
+		}
+		
+		
+	}
 }
+
