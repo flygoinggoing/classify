@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import cn.bistu.icdd.gpf.selectFeature.IFeatureSelectionCalculater;
@@ -32,6 +32,13 @@ public class MICalculater implements IFeatureSelectionCalculater {
 	// 定义类别枚举类
 	enum Classs {
 		A,B,C,D,E,F,G,H;
+		
+		/**
+		 * @return 返回种类个数
+		 */
+		public static int getSize(){
+			return Classs.values().length;
+		}
 	}
 	
 	// 每类的文本数
@@ -66,14 +73,14 @@ public class MICalculater implements IFeatureSelectionCalculater {
 				InitFeatureMap(f);
 			}
 		} else {
-			// 记录总文件个数
-			N++;
 			// 记录每类文件个数
 			Classs classs= addNj(file.getName());
 			// 返回空 表示文件不在提前定义的类范围内
 			if (classs == null) {
 				return;
 			}
+			// 记录总文件个数
+			N++;
 			
 			BufferedReader br = null;
 			Set<String> features = null;
@@ -115,7 +122,7 @@ public class MICalculater implements IFeatureSelectionCalculater {
 				}
 				// 更新DF与每类的DF
 				FeatureInfo value = featureMap.get(key);
-				value.setDfIncrease();  //DF++
+				value.setDfIncrease();  // DF++
 				int index = classs.ordinal();
 				value.setDfOfEachClassIncrease(index); // 每类的DF++
 			}
@@ -124,10 +131,26 @@ public class MICalculater implements IFeatureSelectionCalculater {
 	
 	/**
 	 * 计算MI
+	 * 核心算法
 	 */
 	@Override
 	public void calcWeight() {
-		
+		Set<Entry<String, FeatureInfo>> featureMapSet = featureMap.entrySet();
+		Iterator<Entry<String, FeatureInfo>> featureMapIter = featureMapSet.iterator();
+		while (featureMapIter.hasNext()) {
+			Entry<String, FeatureInfo> featureEntry = featureMapIter.next();
+			FeatureInfo fInfo = featureEntry.getValue();
+			// 每类分别计算
+			for (int i = 0 ; i < Classs.getSize(); i++ ) {
+				int A = fInfo.getDfOfEachClass(i);
+				int B = fInfo.getDF() - A;
+				int C = Nj[i] - A;
+				Double pc = (Nj[i] * 1.0)/N;   // P(Cj)
+				
+				Double I_i = pc * Math.log(( (A*N) * 1.0) / ( (A+C) * (A+B) ));
+				fInfo.setMiOfeachClass(i, I_i);
+			}
+		}
 	}
 
 
@@ -202,6 +225,7 @@ public class MICalculater implements IFeatureSelectionCalculater {
 			miOfEachClass = new ArrayList<Double>();
 			for (int i = 0; i <= Classs.values().length; i++ ) {
 				dfOfEachClass.add(0);
+				miOfEachClass.add(0.0);
 			}
 		}
 		
