@@ -22,8 +22,9 @@ public class TextClassifer {
 		// 文档根目录
 		 //String fileRootPath = "D:/NLP/每类个数类似文本分类";
 		 //String fileRootPath = "D:/NLP/test";
+		 String fileRootPath = "D:/NLP/tst";
 		 //String fileRootPath = "D:/NLP/分类测试";
-		 String fileRootPath = "D:/NLP/分类测试2";
+		 //String fileRootPath = "D:/NLP/分类测试2";
 		 //String fileRootPath = "D:/NLP/信息检索与搜索引擎/大作业";
 		
 		Long startTime = System.currentTimeMillis();
@@ -36,10 +37,12 @@ public class TextClassifer {
 		int fileNum = pre.start(fileRootPath+"/训练集");
 		
 		System.out.println("***********************开始特征提取*********************");
-		
+		Long startMITime = System.currentTimeMillis();
 		MICalculater mi = new MICalculater(fileRootPath+"/训练集预处理");
 		mi.calcWeight();
 		mi.printOriginFeature();
+		Long endMITime = System.currentTimeMillis();
+		System.out.println("特征提取用时" + (endMITime - startMITime));
 		
 		/*
 		// 特征提取

@@ -30,7 +30,7 @@ public class WordFilter implements Filter<String,String>{
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i  < words.length ; i++) {
 			char w = words[i];
-			if (isChinese(w)) {
+			/*if (isChinese(w)) {
 				// 汉字
 				sb.append(w);
 			} else if (isHALFWIDTH_AND_FULLWIDTH_FORMS(w)){
@@ -40,6 +40,14 @@ public class WordFilter implements Filter<String,String>{
 					// 汉字
 					sb.append(w);
 				}
+			}*/
+			
+			if (isChinese(w)) {
+				// 汉字
+				sb.append(w);
+			} else {
+				// 不是汉字插入空格
+				sb.append(' ');
 			}
 		}
 		return sb.toString();
@@ -86,26 +94,42 @@ public class WordFilter implements Filter<String,String>{
 	 * @return 是中文返回true 否则返回false
 	 */
 	private boolean isChinese(char c) {
-		Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
 		/*
 		 * BASIC_LATIN (拉丁)   // 编程中的所有字母、数字、标点
 		 * Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A    // 扩展区A 
 		 * Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B    // 扩展区B 
 		 */
-		if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS     /*  CJk（中日韩）  */
-				|| ub == Character.UnicodeBlock.BASIC_LATIN     /* 拉丁 */
-				|| ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS     /* CJK补充 */
-				|| ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION     /* 中文标点  〔  〕  〖  〗有待解决  */
-				|| ub == Character.UnicodeBlock.GENERAL_PUNCTUATION) {    /* 汉语引号   ‰ 有待解决 */
+		/*
+		Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
+		if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS       CJk（中日韩）  
+				|| ub == Character.UnicodeBlock.BASIC_LATIN      拉丁 
+				|| ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS      CJK补充 
+				|| ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION      中文标点  〔  〕  〖  〗有待解决  
+				|| ub == Character.UnicodeBlock.GENERAL_PUNCTUATION) {     汉语引号   ‰ 有待解决 
 			return true;
 		}
+		return false;
+		*/
 		
 		/*
-		if ((c >= 0x4e00) && (c <= 0x9fbb)){
+		if ((c >= 0x4e00) && (c <= 0x9fbb)){    
+			//汉字
 			return true;
+		} else if ((c >= 0xFF00) && (c <= 0xFF5E)) {
+			// ANSI对应的全角字符
+			return true;
+		} else {
+			return false;
 		}
 		*/
-		return false;
+		
+		if ((c >= 0x4e00) && (c <= 0x9fbb)){    
+			//汉字
+			return true;
+		} else {
+			return false;
+		}
+		
 	}
 	
 	
