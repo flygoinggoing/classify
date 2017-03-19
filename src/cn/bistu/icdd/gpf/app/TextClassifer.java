@@ -3,6 +3,7 @@ package cn.bistu.icdd.gpf.app;
 import cn.bistu.icdd.gpf.classifier.RocchioClassifier;
 import cn.bistu.icdd.gpf.preprocess.Preprocessor;
 import cn.bistu.icdd.gpf.selectFeature.impl.DFCalculater;
+import cn.bistu.icdd.gpf.selectFeature.impl.MICalculater;
 
 /**
  * 文本分类程序
@@ -21,7 +22,8 @@ public class TextClassifer {
 		// 文档根目录
 		 //String fileRootPath = "D:/NLP/每类个数类似文本分类";
 		 //String fileRootPath = "D:/NLP/test";
-		 String fileRootPath = "D:/NLP/分类测试";
+		 //String fileRootPath = "D:/NLP/分类测试";
+		 String fileRootPath = "D:/NLP/分类测试2";
 		 //String fileRootPath = "D:/NLP/信息检索与搜索引擎/大作业";
 		
 		Long startTime = System.currentTimeMillis();
@@ -29,11 +31,15 @@ public class TextClassifer {
 		System.out.println("**********************开始预处理**********************");
 		
 		// 数据预处理
-		Preprocessor pre = new Preprocessor("gb2312");
-		//Preprocessor pre = new Preprocessor("utf-8");
+		//Preprocessor pre = new Preprocessor("gb2312");
+		Preprocessor pre = new Preprocessor("utf-8");
 		int fileNum = pre.start(fileRootPath+"/训练集");
 		
 		System.out.println("***********************开始特征提取*********************");
+		
+		MICalculater mi = new MICalculater(fileRootPath+"/训练集预处理");
+		mi.calcWeight();
+		mi.printOriginFeature();
 		
 		/*
 		// 特征提取

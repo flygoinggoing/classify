@@ -1,16 +1,22 @@
 package cn.bistu.icdd.gpf.selectFeature.impl;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -46,7 +52,7 @@ public class MICalculater implements IFeatureSelectionCalculater {
 	
 	String corpusFilePath = null;     // 预处理后文件路径
 	String outPath = null;		// 输出文件路径
-	String exportCharacterItemsPath = null; // 输出原始特征项路径
+	String exportFeaturePath = null; // 输出原始特征项路径
 	
 	/**
 	 * 初始化
@@ -57,7 +63,7 @@ public class MICalculater implements IFeatureSelectionCalculater {
 		File corpusFile = new File(corpusFilePath);
 		String root = corpusFile.getParentFile().getAbsolutePath();
 		outPath = root + "/抽取特征项";
-		exportCharacterItemsPath = root + "/原始特征项";
+		exportFeaturePath = root + "/原始特征项";
 		
 		InitFeatureMap(corpusFile);
 	}
@@ -160,14 +166,63 @@ public class MICalculater implements IFeatureSelectionCalculater {
 	 */
 	@Override
 	public void extractFeature() {
-		
 	}
 	
 	/**
-	 * 输出原始特征项
+	 * 输出原始特征项，输出格式：特征项 DF MI
+	 * 按MI值大小排序
 	 */
 	public void printOriginFeature(){
+		File file = new File(exportFeaturePath+"/原始特征项.txt");
+
+		if (!file.exists()) {
+			File parent = file.getParentFile();
+			if (!parent.exists()) {
+				parent.mkdirs();
+			}
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		
+		BufferedWriter bw = null;
+		try {
+			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+			List<Entry<String, FeatureInfo>> featureList = new ArrayList<Entry<String, FeatureInfo>>(featureMap.entrySet());
+			Collections.sort(featureList, new Comparator<Entry<String, FeatureInfo>>() {
+				@Override
+				public int compare(Entry<String, FeatureInfo> o1, Entry<String, FeatureInfo> o2) {
+					/*if ((o1.getValue().getMaxMi() - o2.getValue().getMaxMi()) > 0) {
+						return 1;
+						
+					} else {
+						return -1;
+					}*/
+					return o1.getValue().getMaxMi().compareTo(o2.getValue().getMaxMi());
+				}
+			});
+			
+			for (Entry<String, FeatureInfo> entry : featureList) {
+				bw.write(entry.getKey() + " " + entry.getValue().getDF() + " " + entry.getValue().getDfOfEachClass(0)+ " "+ entry.getValue().getDfOfEachClass(1)+ " "+ entry.getValue().getDfOfEachClass(2)+ " "+ entry.getValue().getDfOfEachClass(3)+ " "+ entry.getValue().getDfOfEachClass(4)+ " "+ entry.getValue().getDfOfEachClass(5)+ " "+ entry.getValue().getDfOfEachClass(6)+ " " + entry.getValue().getMaxMi());
+				bw.newLine();
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			if (bw != null) {
+				try {
+					bw.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 	
 	/**
@@ -254,11 +309,20 @@ public class MICalculater implements IFeatureSelectionCalculater {
 		}
 		
 		/**
+		 * 返回MI （最大值） 
+		 * 
+		 * @return
+		 */
+		public Double getMaxMi(){
+			return Collections.max(this.miOfEachClass);
+		}
+		
+		/**
 		 * 类内df值 ++
 		 * @param index 序号
 		 */
 		public void setDfOfEachClassIncrease(int index){
-			dfOfEachClass.set(index, getDfOfEachClass(index));
+			dfOfEachClass.set(index, getDfOfEachClass(index) + 1);
 		}
 		
 		/**
