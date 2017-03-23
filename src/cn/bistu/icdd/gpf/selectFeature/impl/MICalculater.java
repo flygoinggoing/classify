@@ -166,6 +166,50 @@ public class MICalculater implements IFeatureSelectionCalculater {
 	 */
 	@Override
 	public void extractFeature() {
+		Double threshold = 0.2; // 阈值
+		
+		File file = new File(outPath+"/抽取特征项.txt");
+
+		if (!file.exists()) {
+			File parent = file.getParentFile();
+			if (!parent.exists()) {
+				parent.mkdirs();
+			}
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		BufferedWriter bw = null;
+		try {
+			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+			List<Entry<String, FeatureInfo>> featureList = sort();
+			
+			for (Entry<String, FeatureInfo> entry : featureList) {
+				Double maxMi = entry.getValue().getMaxMi();
+				if (maxMi > threshold) {
+					
+					bw.write(entry.getKey() + " " + entry.getValue().getDF() + " " + entry.getValue().getDfOfEachClass(0)+ " "+ entry.getValue().getDfOfEachClass(1)+ " "+ entry.getValue().getDfOfEachClass(2)+ " "+ entry.getValue().getDfOfEachClass(3)+ " "+ entry.getValue().getDfOfEachClass(4)+ " "+ entry.getValue().getDfOfEachClass(5)+ " "+ entry.getValue().getDfOfEachClass(6)+ " " + entry.getValue().getMaxMi());
+					bw.newLine();
+				}
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			if (bw != null) {
+				try {
+					bw.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 	
 	/**
@@ -190,19 +234,7 @@ public class MICalculater implements IFeatureSelectionCalculater {
 		BufferedWriter bw = null;
 		try {
 			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
-			List<Entry<String, FeatureInfo>> featureList = new ArrayList<Entry<String, FeatureInfo>>(featureMap.entrySet());
-			Collections.sort(featureList, new Comparator<Entry<String, FeatureInfo>>() {
-				@Override
-				public int compare(Entry<String, FeatureInfo> o1, Entry<String, FeatureInfo> o2) {
-					/*if ((o1.getValue().getMaxMi() - o2.getValue().getMaxMi()) > 0) {
-						return 1;
-						
-					} else {
-						return -1;
-					}*/
-					return o1.getValue().getMaxMi().compareTo(o2.getValue().getMaxMi());
-				}
-			});
+			List<Entry<String, FeatureInfo>> featureList = sort();
 			
 			for (Entry<String, FeatureInfo> entry : featureList) {
 				bw.write(entry.getKey() + " " + entry.getValue().getDF() + " " + entry.getValue().getDfOfEachClass(0)+ " "+ entry.getValue().getDfOfEachClass(1)+ " "+ entry.getValue().getDfOfEachClass(2)+ " "+ entry.getValue().getDfOfEachClass(3)+ " "+ entry.getValue().getDfOfEachClass(4)+ " "+ entry.getValue().getDfOfEachClass(5)+ " "+ entry.getValue().getDfOfEachClass(6)+ " " + entry.getValue().getMaxMi());
@@ -223,6 +255,29 @@ public class MICalculater implements IFeatureSelectionCalculater {
 				}
 			}
 		}
+	}
+
+	/**
+	 * 排序（有大到小）
+	 * @return 返回list集合
+	 */
+	private List<Entry<String, FeatureInfo>> sort() {
+		List<Entry<String, FeatureInfo>> featureList = new ArrayList<Entry<String, FeatureInfo>>(featureMap.entrySet());
+		Collections.sort(featureList, new Comparator<Entry<String, FeatureInfo>>() {
+			@Override
+			public int compare(Entry<String, FeatureInfo> o1, Entry<String, FeatureInfo> o2) {
+				/*if ((o1.getValue().getMaxMi() - o2.getValue().getMaxMi()) > 0) {
+					return 1;
+					
+				} else {
+					return -1;
+				}*/
+				
+				// 加负号从大到小排序
+				return -(o1.getValue().getMaxMi().compareTo(o2.getValue().getMaxMi()));
+			}
+		});
+		return featureList;
 	}
 	
 	/**
