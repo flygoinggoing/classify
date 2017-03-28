@@ -5,8 +5,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,16 +55,37 @@ public class TFIDFCalculater {
 		
 		// 生成特征项的路径
 		File corfile = new File(corpusFilePath); 
-		String inPath = corfile.getParentFile().getAbsolutePath() + "/抽取特征项/特征项.txt";
+		String root = corfile.getParentFile().getAbsolutePath();
+		String inPath = root + "/抽取特征项/特征项.txt";
 		
 		File dfFile = new File(inPath);
+		
+		
+		String outFilePath = root + "/文本表示/文本表示.txt";
+		File outFile = new File(outFilePath);
+		if (!outFile.exists()) {
+			File parent = outFile.getParentFile();
+			if (!parent.exists()) {
+				parent.mkdirs();
+			}
+			try {
+				outFile.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		try {
+			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile)));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 		
 		N = n;
 		
 		System.out.println("读入特征项");
 		// 读入DF值
 		initDF(dfFile);
-		
 		
 	}
 	
@@ -187,7 +210,7 @@ public class TFIDFCalculater {
 				wsAll.put(file.getName(), list);
 				
 				// 将文件的ws打出
-				//printWS(file.getName(), wsOutFile);
+				printWS(file.getName());
 				//System.out.println("处理完第" + (i++) + "篇");
 				
 			} catch (UnsupportedEncodingException e) {
@@ -223,13 +246,18 @@ public class TFIDFCalculater {
 	/**
 	 * 打印文件的特征权
 	 * @param fileName
-	 * @param wsOutFile2
 	 */
-	private void printWS(String fileName, File wsOutFile2) {
-		String line = fileName + " " + ws.values().toString();
+	private void printWS(String fileName) {
+		StringBuilder line = new StringBuilder();
+		line.append(fileName);
+		Double[] list = (Double[]) ws.values().toArray();
 
+		for (int i = 1; i <= list.length; i++) {
+			line.append(" " + i + ":" + list[i]);
+		}
+		
 		try {
-			bw.write(line);
+			bw.write(line.toString());
 			bw.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
