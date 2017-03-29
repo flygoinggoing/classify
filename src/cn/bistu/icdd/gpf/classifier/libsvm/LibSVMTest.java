@@ -17,7 +17,6 @@ public class LibSVMTest {
 	    svm_predict p= new svm_predict(); 
 	    t.main(arg);   //调用
 	    p.main(parg);  //调用
-	    
 
 	}
 }

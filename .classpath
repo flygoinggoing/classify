@@ -8,6 +8,7 @@
 	<classpathentry kind="lib" path="lib/lucene-core-4.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-queryparser-4.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/trove.jar"/>
+	<classpathentry kind="lib" path="lib/libsvm.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
