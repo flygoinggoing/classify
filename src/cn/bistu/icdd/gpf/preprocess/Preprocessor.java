@@ -66,20 +66,7 @@ public class Preprocessor {
 	 * @throws Exception
 	 */
 	public Preprocessor() throws Exception{
-		WordFilter wf = new WordFilter();
-		PartOfSpeechFilter posf = new PartOfSpeechFilter();
-		// TokenizerFilter tf = new TokenizerFilter();
-		StopWordFilter swf = StopWordFilter.getInstance();
-		NormalizationFilter nf = NormalizationFilter.getInstance();
-		
-		// 将处理器添加到流
-		filter.add(wf);
-		filter.add(posf);
-		// filter.add(tf);
-		filter.add(swf);
-		filter.add(nf);
-		
-		code = "utf-8";
+		this("utf-8");
 	}
 	
 	/**
@@ -149,7 +136,7 @@ public class Preprocessor {
 				sb = null;
 				content = null;
 				// 全部处理
-				 passage = processString(passage);
+				passage = processString(passage);
 				
 				// 不归一处理
 				//passage = filter.get(2).process(filter.get(1).process(filter.get(0).process(passage))).toString().replace("[", "").replace("]", " ").replace(",", "");

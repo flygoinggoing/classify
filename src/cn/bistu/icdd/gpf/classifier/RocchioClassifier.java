@@ -36,16 +36,21 @@ public class RocchioClassifier implements Classifier {
 	
 	// 总文档数
 	private int N = 0;
+	
+	// 预测文本的编码
+	private String charSet;
 
 	/**
 	 * 初始化
 	 * @param corpusFilePath 预处理后的语料
 	 * @param inPath 特征项路径
 	 * @param testFilePath 测试文件路径
+	 * @param charSet 预测文本编码
 	 * @throws FileNotFoundException 
 	 * @throws UnsupportedEncodingException 
 	 */
-	public RocchioClassifier(String corpusFilePath, String testFilePath) throws UnsupportedEncodingException, FileNotFoundException {
+	public RocchioClassifier(String corpusFilePath, String testFilePath, String charSet) throws UnsupportedEncodingException, FileNotFoundException {
+		this.charSet = charSet;
 		this.corpusFilePath = corpusFilePath;
 		this.testFilePath = testFilePath;
 		String rootPath = corpusFilePath.substring(0,corpusFilePath.lastIndexOf("/"));   //结果输出路径
@@ -67,6 +72,18 @@ public class RocchioClassifier implements Classifier {
 			N++;
 		}
 		
+	}
+	
+	/**
+	 * 初始化 (默认utf-8编码)
+	 * @param corpusFilePath 预处理后的语料
+	 * @param inPath 特征项路径
+	 * @param testFilePath 测试文件路径
+	 * @throws FileNotFoundException 
+	 * @throws UnsupportedEncodingException 
+	 */
+	public RocchioClassifier(String corpusFilePath, String testFilePath) throws UnsupportedEncodingException, FileNotFoundException{
+		this(corpusFilePath,testFilePath,"utf-8");
 	}
 
 	/**
@@ -94,7 +111,7 @@ public class RocchioClassifier implements Classifier {
 	public void processClassifier() {
 		// 1.文件预处理
 		try {
-			Preprocessor predeal = new Preprocessor();
+			Preprocessor predeal = new Preprocessor(charSet);
 			predeal.start(testFilePath);
 		} catch (Exception e) {
 			e.printStackTrace();

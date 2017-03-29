@@ -97,7 +97,7 @@ public class DFCalculater implements IFeatureSelectionCalculater{
 			while (iter.hasNext()) {
 				Entry<String, Integer> it = iter.next();
 				int value = it.getValue();
-				if (value > 30 && value < 600) {
+				if (value > 30 && value < 300) {
 					bw.write(it.getKey() +"  "+ it.getValue());
 					bw.newLine();
 				}

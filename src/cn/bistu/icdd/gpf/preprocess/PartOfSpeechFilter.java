@@ -39,7 +39,6 @@ public class PartOfSpeechFilter implements Filter<String, List<String>>{
 	public List<String> process(String passage) {
 		List<String> listWord = null;   // 存词
 		try {
-			//POSTagger pos = new POSTagger("models/seg.m","models/pos.m");
 			String[][] str = pos.tag2Array(passage);
 			List<String> words = Arrays.asList(str[0]);
 			List<String> tags = Arrays.asList(str[1]);
