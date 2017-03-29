@@ -27,29 +27,37 @@ import java.util.Set;
  */
 public class TFIDFCalculater {
 	
+	// 使用内存模式，将表示的文件向量存储在内存
+	public static final int USEMEMORY = 1;   
+	
+	// 使用外存模式，不适用内存存储向量
+	public static final int NONUSEMEMORY = 0;
+	
+	// 存储用户选择的模式
+	private int mode;
+	
 	private final int N ;   // 总文档数   此处应该为上一步传过来
 	
-	// 可以添加一个存储所有的特征全的Map，减少文件读写用时
-	/*
-	 * 需要增加策略：避免大规模语料导致占用内存过多
-	 * 
-	 * 判断文本个数   大于某个值时导出文件   小于某个值时存在内存里
-	 */
-	Map<String , List<Double>> wsAll = new HashMap<String , List<Double>>();  // 格式：文件名  向量（ws）
+	Map<String , List<Double>>  wsAll = null;  // 格式：文件名  向量（ws）
 	
 	private Map<String ,Double> ws = new HashMap<String ,Double>();   // 特征权 格式 ：特征项  权值 
 	private Map<String ,Double> idf = new HashMap<String ,Double>();   // 特征项及IDF值
 	private Map<String ,Integer> tf = new HashMap<String ,Integer>();  // 文本的特征词频
+	
+	// 将文本表示向量写出到文件缓存
 	private BufferedWriter bw = null;   
 	
-	String corpusFilePath = null;
+	String corpusFilePath = null;   //预处理后文本路径
+
 	
 	/**
 	 * 初始化
 	 * @param corpusFilePath 预处理后的语料
-	 * @param inPath 特征项路径
+	 * @param n 总文档数
+	 * @param mode 是否使用内存模式。内存模式：速度快适合小规模的语料  外存模式：避免大规模语料导致占用内存过多，速度慢，适合大量文本
 	 */
-	public TFIDFCalculater(String corpusFilePath ,int n) {
+	public TFIDFCalculater(String corpusFilePath ,int n ,int mode) {
+		
 		System.out.println("TF-IDF初始化：");
 		this.corpusFilePath = corpusFilePath;
 		
@@ -57,28 +65,36 @@ public class TFIDFCalculater {
 		File corfile = new File(corpusFilePath); 
 		String root = corfile.getParentFile().getAbsolutePath();
 		String inPath = root + "/抽取特征项/特征项.txt";
-		
 		File dfFile = new File(inPath);
-		
-		
-		String outFilePath = root + "/文本表示/文本表示.txt";
-		File outFile = new File(outFilePath);
-		if (!outFile.exists()) {
-			File parent = outFile.getParentFile();
-			if (!parent.exists()) {
-				parent.mkdirs();
-			}
-			try {
-				outFile.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
+
+		// 判断模式
+		if (mode == TFIDFCalculater.USEMEMORY) {
+			// 内存模式创建存储所有向量的容器
+			wsAll = new HashMap<String , List<Double>>();
+			this.mode = TFIDFCalculater.USEMEMORY;
+		} else {
+			this.mode = TFIDFCalculater.NONUSEMEMORY;
+			// 外存模式创建写出文本和流
+
+			String outFilePath = root + "/文本表示/文本表示.txt";
+			File outFile = new File(outFilePath);
+			if (!outFile.exists()) {
+				File parent = outFile.getParentFile();
+				if (!parent.exists()) {
+					parent.mkdirs();
+				}
+				try {
+					outFile.createNewFile();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 			
-		}
-		try {
-			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile)));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			try {
+				bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile)));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		N = n;
@@ -89,6 +105,15 @@ public class TFIDFCalculater {
 		
 	}
 	
+	/**
+	 * 初始化（默认使用内存模式）
+	 * @param corpusFilePath 预处理后的语料
+	 * @param n 总文档数
+	 */
+	public TFIDFCalculater(String corpusFilePath ,int n){
+		this(corpusFilePath, n, TFIDFCalculater.USEMEMORY);
+	}
+
 	/**
 	 * 文件表示主程序
 	 * @param corpusFile 预处理后的文件
@@ -102,6 +127,7 @@ public class TFIDFCalculater {
 		calcTF_IDF(corpusFile);
 		
 		
+		// 关闭文件写出流
 		if (bw != null) {
 			try {
 				bw.close();
@@ -112,7 +138,8 @@ public class TFIDFCalculater {
 		
 		Long endTime = System.currentTimeMillis();
 		System.out.println("计算完成，共用时：" + (endTime-startTime));
-		
+			
+		// 返回所有的特征向量
 		return wsAll;
 	}
 	
@@ -192,7 +219,6 @@ public class TFIDFCalculater {
 					}
 				}
 				
-				
 				// 计算TF-IDF和词一同存入ws
 				/*** 又用set输出是不是有问题  **/
 				Set<Entry<String, Integer>> tfSet = tf.entrySet();  
@@ -204,14 +230,17 @@ public class TFIDFCalculater {
 					ws.put(key, value);
 				}
 				
-				// 加入wsAll
-				Collection<Double> coll =  ws.values();  // 是按顺序输出吗
-				List<Double> list = new ArrayList<Double>(coll);
-				wsAll.put(file.getName(), list);
-				
-				// 将文件的ws打出
-				printWS(file.getName());
-				//System.out.println("处理完第" + (i++) + "篇");
+				// 判断模式进行不同的处理
+				if (mode == TFIDFCalculater.USEMEMORY){
+					// 加入wsAll
+					Collection<Double> coll =  ws.values();  // 是按顺序输出吗
+					List<Double> list = new ArrayList<Double>(coll);
+					wsAll.put(file.getName(), list);
+				} else {
+					// 将文件的ws打出
+					printWS(file.getName());
+					//System.out.println("处理完第" + (i++) + "篇");
+				}
 				
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
@@ -239,21 +268,24 @@ public class TFIDFCalculater {
 		Iterator<String> iter = dfSet.iterator();
 		while (iter.hasNext()) {
 			tf.put(iter.next(),0);
-			
 		}
 	}
 
 	/**
 	 * 打印文件的特征权
-	 * @param fileName
+	 * @param fileName 文件名
 	 */
 	private void printWS(String fileName) {
 		StringBuilder line = new StringBuilder();
 		line.append(fileName);
 		Double[] list = (Double[]) ws.values().toArray();
 
+		// 只保存不为零的
 		for (int i = 1; i <= list.length; i++) {
-			line.append(" " + i + ":" + list[i]);
+			Double value = list[i];
+			if (value != 0) {
+				line.append(" " + i + ":" + list[i]);
+			}
 		}
 		
 		try {
