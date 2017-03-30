@@ -52,7 +52,7 @@ public class TFIDFCalculater {
 	
 	/**
 	 * 初始化
-	 * @param corpusFilePath 预处理后的语料
+	 * @param corpusFilePath 预处理后的语料文件路径
 	 * @param n 总文档数
 	 * @param mode 是否使用内存模式。内存模式：速度快适合小规模的语料  外存模式：避免大规模语料导致占用内存过多，速度慢，适合大量文本
 	 */
@@ -64,8 +64,8 @@ public class TFIDFCalculater {
 		// 生成特征项的路径
 		File corfile = new File(corpusFilePath); 
 		String root = corfile.getParentFile().getAbsolutePath();
-		String inPath = root + "/抽取特征项/特征项.txt";
-		File dfFile = new File(inPath);
+		String dfFilePath = root + "/抽取特征项/特征项.txt";
+		File dfFile = new File(dfFilePath);
 
 		// 判断模式
 		if (mode == TFIDFCalculater.USEMEMORY) {
