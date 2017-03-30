@@ -56,7 +56,7 @@ public class TFIDFCalculater {
 	 * @param n 总文档数
 	 * @param mode 是否使用内存模式。内存模式：速度快适合小规模的语料  外存模式：避免大规模语料导致占用内存过多，速度慢，适合大量文本
 	 */
-	public TFIDFCalculater(String corpusFilePath ,int n ,int mode) {
+	public TFIDFCalculater(String corpusFilePath,int n,int mode) {
 		
 		System.out.println("TF-IDF初始化：");
 		this.corpusFilePath = corpusFilePath;
@@ -76,7 +76,7 @@ public class TFIDFCalculater {
 			this.mode = TFIDFCalculater.NONUSEMEMORY;
 			// 外存模式创建写出文本和流
 
-			String outFilePath = root + "/文本表示/文本表示.txt";
+			String outFilePath = root + "/文本表示/"+ corpusFilePath.substring(corpusFilePath.lastIndexOf("/")+1, corpusFilePath.length()) +"文本表示.txt";
 			File outFile = new File(outFilePath);
 			if (!outFile.exists()) {
 				File parent = outFile.getParentFile();
@@ -211,7 +211,7 @@ public class TFIDFCalculater {
 					// 如果词在idf表中，说明是特征项
 					if (idf.containsKey(list)) {
 						//int value = 0;
-						//if (tf.containsKey(list)) {
+						//if (tf.containsKey(list)) { 
 						//不用判断  根据tf的初始化得出，在idf中必在tf中
 						int value = tf.get(list);
 						//}
@@ -278,16 +278,18 @@ public class TFIDFCalculater {
 	private void printWS(String fileName) {
 		StringBuilder line = new StringBuilder();
 		line.append(fileName);
-		Double[] list = (Double[]) ws.values().toArray();
+		Double[] list = null ;
+		list = ws.values().toArray(new Double[0]);
 
 		// 只保存不为零的
 		for (int i = 1; i <= list.length; i++) {
-			Double value = list[i];
+			Double value = list[i-1];
 			if (value != 0) {
-				line.append(" " + i + ":" + list[i]);
+				line.append(" " + i + ":" + list[i-1]);
 			}
 		}
 		
+		System.out.println(line.toString());
 		try {
 			bw.write(line.toString());
 			bw.newLine();

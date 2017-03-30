@@ -122,7 +122,7 @@ public class RocchioClassifier implements Classifier {
 		String testcorpusFilePath = file.getParentFile().getAbsolutePath() + "/" + file.getName()+"预处理";
 		
 		// 2.计算TF-idf值
-		TFIDFCalculater tfidf = new TFIDFCalculater(testcorpusFilePath , N);
+		TFIDFCalculater tfidf = new TFIDFCalculater(testcorpusFilePath, N);
 		wsTest = tfidf.process();
 
 		
