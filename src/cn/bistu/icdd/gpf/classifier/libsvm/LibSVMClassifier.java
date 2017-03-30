@@ -1,7 +1,7 @@
 package cn.bistu.icdd.gpf.classifier.libsvm;
 import java.io.IOException;
 
-public class LibSVMTest {
+public class LibSVMClassifier {
 	public static void main(String[] args) throws IOException {
 		   
 	    String []arg ={ "source\\trainFile.txt", //存放SVM训练模型用的数据的路径
