@@ -151,4 +151,36 @@ public class WordFilter implements Filter<String,String>{
         
         return c;
     }
+    
+    /**
+     * 将数字从全角转换为半角
+     * @param c 全角字符
+     * @return 半角字符
+     */
+    private char numToSemiangle(char c){
+    	switch(c){
+    	case '０':
+    		return '0';
+    	case '１':
+    		return '1';
+    	case '２':
+    		return '2';
+    	case '３':
+    		return '3';
+    	case '４':
+    		return '4';
+    	case '５':
+    		return '5';
+    	case '６':
+    		return '6';
+    	case '７':
+    		return '7';
+    	case '８':
+    		return '8';
+    	case '９':
+    		return '9';
+    	default:
+    		return c;
+    	}
+    }
 }
