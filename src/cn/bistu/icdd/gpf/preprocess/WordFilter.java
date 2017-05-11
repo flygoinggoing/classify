@@ -183,4 +183,120 @@ public class WordFilter implements Filter<String,String>{
     		return c;
     	}
     }
+    
+    /**
+     * 将字母从全角转换为半角
+     * @param c 全角字符
+     * @return 半角字符
+     */
+    private char letterToSemiangle(char c){
+    	switch(c){
+    	case 'ａ':
+    		return 'a';
+    	case 'ｂ':
+    		return 'b';
+    	case 'ｃ':
+    		return 'c';
+    	case 'ｄ':
+    		return 'd';
+    	case 'ｅ':
+    		return 'e';
+    	case 'ｆ':
+    		return 'f';
+    	case 'ｇ':
+    		return 'g';
+    	case 'ｈ':
+    		return 'h';
+    	case 'ｉ':
+    		return 'i';
+    	case 'ｊ':
+    		return 'j';
+    	case 'ｋ':
+    		return 'k';
+    	case 'ｌ':
+    		return 'l';
+    	case 'ｍ':
+    		return 'm';
+    	case 'ｎ':
+    		return 'n';
+    	case 'ｏ':
+    		return 'o';
+    	case 'ｐ':
+    		return 'p';
+    	case 'ｑ':
+    		return 'q';
+    	case 'ｒ':
+    		return 'r';
+    	case 'ｓ':
+    		return 's';
+    	case 'ｔ':
+    		return 't';
+    	case 'ｕ':
+    		return 'u';
+    	case 'ｖ':
+    		return 'v';
+    	case 'ｗ':
+    		return 'w';
+    	case 'ｘ':
+    		return 'x';
+    	case 'ｙ':
+    		return 'y';
+    	case 'ｚ':
+    		return 'z';
+    	case 'Ａ':
+    		return 'A';
+    	case 'Ｂ':
+    		return 'B';
+    	case 'Ｃ':
+    		return 'C';
+    	case 'Ｄ':
+    		return 'D';
+    	case 'Ｅ':
+    		return 'E';
+    	case 'Ｆ':
+    		return 'F';
+    	case 'Ｇ':
+    		return 'G';
+    	case 'Ｈ':
+    		return 'H';
+    	case 'Ｉ':
+    		return 'I';
+    	case 'Ｊ':
+    		return 'J';
+    	case 'Ｋ':
+    		return 'K';
+    	case 'Ｌ':
+    		return 'L';
+    	case 'Ｍ':
+    		return 'M';
+    	case 'Ｎ':
+    		return 'N';
+    	case 'Ｏ':
+    		return 'O';
+    	case 'Ｐ':
+    		return 'P';
+    	case 'Ｑ':
+    		return 'Q';
+    	case 'Ｒ':
+    		return 'R';
+    	case 'Ｓ':
+    		return 'S';
+    	case 'Ｔ':
+    		return 'T';
+    	case 'Ｕ':
+    		return 'U';
+    	case 'Ｖ':
+    		return 'V';
+    	case 'Ｗ':
+    		return 'W';
+    	case 'Ｘ':
+    		return 'X';
+    	case 'Ｙ':
+    		return 'Y';
+    	case 'Ｚ':
+    		return 'Z';
+    	default:
+    		return c;
+    	}
+    }
 }
