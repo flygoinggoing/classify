@@ -86,30 +86,32 @@ public class StopWordFilter implements Filter<List<String>,List<String>>{
 	@Override
 	public List<String> process(List<String> passage) {
 		
-		/*
-		 * 当大部分文件中的词次数——远大于——停用词表时用本循环
-		 
-		for (String word : stopWords) {
+		if (passage.size() > stopWords.size()) {
+			/*
+			 * 当大部分文件中的词次数——远大于——停用词表时用本循环
+			 */
+			for (String word : stopWords) {
+				Iterator<String> iter = passage.iterator();
+				while (iter.hasNext()) {
+					if (word.equals(iter.next())) {
+						iter.remove();
+					}
+				}
+				
+			}
+		} else {
+			/*
+			 * 当大部分文件中的词次数——小于等于——停用词表时用本循环
+			 * 而且还有跳出循环操作
+			 */
 			Iterator<String> iter = passage.iterator();
 			while (iter.hasNext()) {
-				if (word.equals(iter.next())) {
-					iter.remove();
-				}
-			}
-			
-		}
-		*/
-		/*
-		 * 当大部分文件中的词次数——小于等于——停用词表时用本循环
-		 * 而且还有跳出循环操作
-		 */
-		Iterator<String> iter = passage.iterator();
-		while (iter.hasNext()) {
-			String word = iter.next();
-			for (String stopword : stopWords) {
-				if (stopword.equals(word)) {
-					iter.remove();
-					break;
+				String word = iter.next();
+				for (String stopword : stopWords) {
+					if (stopword.equals(word)) {
+						iter.remove();
+						break;
+					}
 				}
 			}
 		}
